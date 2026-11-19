@@ -1,26 +1,223 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* SalonBook palette */
+  --color-ivory: #faf6ee;
+  --color-cream: #fdfbf7;
+  --color-sand: #f2e9dc;
+  --color-beige: #eadcc9;
+  --color-line: #e4d8c7;
+  --color-espresso: #2f2a26;
+  --color-mocha: #6e6257;
+  --color-gold: #b08d57;
+  --color-gold-soft: #d9c3a0;
+  --color-taupe: #8e7c68;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #faf6ee;
+  --foreground: #2f2a26;
+  --card: #f2e9dc;
+  --card-foreground: #2f2a26;
+  --popover: #fdfbf7;
+  --popover-foreground: #2f2a26;
+  --primary: #2f2a26;
+  --primary-foreground: #faf6ee;
+  --secondary: #eadcc9;
+  --secondary-foreground: #2f2a26;
+  --muted: #f2e9dc;
+  --muted-foreground: #6e6257;
+  --accent: #b08d57;
+  --accent-foreground: #fdfbf7;
+  --destructive: #a3564a;
+  --border: #e4d8c7;
+  --input: #e4d8c7;
+  --ring: #b08d57;
+  --radius: 0.85rem;
+  --sidebar: #2f2a26;
+  --sidebar-foreground: #faf6ee;
+  --sidebar-primary: #b08d57;
+  --sidebar-primary-foreground: #2f2a26;
+  --sidebar-accent: #3a342f;
+  --sidebar-accent-foreground: #faf6ee;
+  --sidebar-border: #453e37;
+  --sidebar-ring: #b08d57;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-gold) 28%, transparent);
+    color: var(--color-espresso);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .eyebrow {
+    @apply text-[0.62rem] font-semibold uppercase tracking-[0.3em] text-mocha;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-line bg-cream/80 px-4 py-3.5 text-sm text-espresso shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition placeholder:text-espresso/35 hover:border-taupe/50 focus:border-gold/70 focus:ring-4 focus:ring-gold/10;
+  }
+
+  .field-label {
+    @apply mb-2 block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-espresso/55;
+  }
+
+  .hairline {
+    @apply h-px w-full bg-line;
+  }
+
+  .dotted-leader {
+    background-image: radial-gradient(circle, rgba(47, 42, 38, 0.28) 1px, transparent 1px);
+    background-size: 6px 6px;
+    background-position: bottom;
+    background-repeat: repeat-x;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-balance-tight {
+    text-wrap: balance;
+  }
+
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-marquee {
+    animation: marquee 42s linear infinite;
+  }
+
+  .animate-float {
+    animation: float-y 7s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 26s linear infinite;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-marquee,
+  .animate-float,
+  .animate-spin-slow {
+    animation: none !important;
+  }
 }
