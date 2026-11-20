@@ -1,21 +1,21 @@
-
 "use client";
-
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { toast } from "sonner"
+import type { FormEvent, ChangeEvent } from "react"
 import {
   ArrowRight,
   Check,
   ImagePlus,
   Info,
   Link2,
-  Loader2,
   Mail,
   UserRound,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import PasswordField from "@/components/auth/PasswordField";
 import GoogleMark from "@/components/auth/GoogleMark";
+import { authClient, signUp } from "@/lib/auth-client";
 
 const SignUp = () => {
   const [fullName, setFullName] = useState("");
@@ -23,9 +23,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [mode, setMode] = useState<"upload" | "url">("upload");
-  const [imageUrl, setImageUrl] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const fileInput = useRef<HTMLInputElement>(null);
@@ -36,21 +34,55 @@ const SignUp = () => {
     { label: "Lowercase", ok: /[a-z]/.test(password) },
   ];
 
-  function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
+  // Handle image selection
+  function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (file) setPreview(URL.createObjectURL(file));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // Handle Google signup
+const handleGoogleSignUp = async () => {
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/",
+  });
+};
+
+  // Handle form submission
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setNotice(null);
-    setLoading(true);
 
-    window.setTimeout(() => {
-      setLoading(false);
-      setNotice("Preview only — accounts will be connected later. Nothing was saved.");
-    }, 900);
+    const formData = new FormData(event.currentTarget);
+
+    const image =
+      mode === "upload"
+        ? undefined
+        : (formData.get("imageUrl") as string) || undefined;
+
+    try {
+      // Create user account
+      const { data, error } = await signUp.email({
+        name: fullName,
+        email,
+        password,
+        ...(image && { image }),
+        callbackURL: "/",
+      });
+
+      if (error) {
+        toast(error.message || "Something went wrong.");
+        console.error(error);
+        return;
+      }
+
+      console.log(data);
+      toast("Account created successfully!");
+    } catch (error) {
+      console.error(error);
+      toast("Unable to create account. Please try again.");
+    }
   }
 
   return (
@@ -80,7 +112,6 @@ const SignUp = () => {
             <input
               id="fullName"
               name="fullName"
-              type="text"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
               placeholder="Eleanor Whitfield"
@@ -180,6 +211,7 @@ const SignUp = () => {
                   <input
                     ref={fileInput}
                     type="file"
+                    name="photo"
                     accept="image/png,image/jpeg,image/webp"
                     onChange={handleFile}
                     className="hidden"
@@ -190,11 +222,10 @@ const SignUp = () => {
                   <Link2 className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-mocha/50" />
                   <input
                     type="url"
-                    value={imageUrl}
-                    onChange={(event) => {
-                      setImageUrl(event.target.value);
-                      setPreview(event.target.value || null);
-                    }}
+                    name="imageUrl"
+                    onChange={(event) =>
+                      setPreview(event.target.value || null)
+                    }
                     placeholder="https://..."
                     className="h-8 w-full rounded-full border border-line bg-ivory pl-8 pr-3 text-[0.7rem] text-espresso outline-none focus:border-gold/70"
                   />
@@ -262,20 +293,10 @@ const SignUp = () => {
 
         <button
           type="submit"
-          disabled={loading}
           className={`${buttonVariants({ size: "lg" })} w-full`}
         >
-          {loading ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              Creating account
-            </>
-          ) : (
-            <>
-              Create account
-              <ArrowRight className="size-4" />
-            </>
-          )}
+          Create account
+          <ArrowRight className="size-4" />
         </button>
       </form>
 
@@ -288,11 +309,10 @@ const SignUp = () => {
       </div>
 
       <button
-        type="button"
-        onClick={() => setNotice("Google sign-up will be connected once accounts are live.")}
-        className="flex h-10 w-full items-center justify-center gap-3 rounded-full border border-line bg-cream text-[0.68rem] font-semibold uppercase tracking-wider text-espresso transition-colors hover:border-taupe/60 hover:bg-sand"
+        type="button"  onClick={handleGoogleSignUp}
+        className="flex h-10 w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-line bg-cream text-[0.68rem] font-semibold uppercase tracking-wider text-espresso transition-colors hover:border-taupe/60 hover:bg-sand"
       >
-        <GoogleMark className="size-[18px]" />
+        <GoogleMark className="size-4.5" />
         Sign up with Google
       </button>
 
@@ -322,5 +342,4 @@ const SignUp = () => {
     </div>
   );
 };
-
 export default SignUp;

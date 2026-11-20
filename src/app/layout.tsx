@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "@/components/ui/sonner"
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
@@ -54,7 +54,8 @@ export default function RootLayout({
           aria-hidden
           className="grain pointer-events-none fixed inset-0 z-100 opacity-[0.035] mix-blend-multiply"
         />
-        {children}
+         <main>{children}</main>
+        <Toaster />
       </body>
     </html>
   );
