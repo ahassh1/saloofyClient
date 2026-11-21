@@ -95,15 +95,15 @@ export default function UserMenu() {
             </p>
           </div>
 
-          {/* Dashboard Link */}
-          <Link
-            href="/dashboard"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-espresso transition hover:bg-sand"
-          >
-            <LayoutDashboard className="size-4" />
-            Dashboard
-          </Link>
+         {/* Dashboard Link */}
+<Link
+  href={`/dashboard/${session?.user?.role ?? "user"}`}
+  onClick={() => setOpen(false)}
+  className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-espresso transition hover:bg-sand"
+>
+  <LayoutDashboard className="size-4" />
+  Dashboard
+</Link>
 
           {/* Logout Action */}
           <button

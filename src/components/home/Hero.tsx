@@ -83,7 +83,7 @@ export default function Hero() {
         <div
           key={item.image}
           aria-hidden={i !== index}
-          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-out ${
+          className={`absolute inset-0 transition-opacity duration-1400 ease-out ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -93,17 +93,17 @@ export default function Hero() {
             fill
             priority={i === 0}
             sizes="100vw"
-            className={`object-cover transition-transform duration-[7000ms] ease-out ${
+            className={`object-cover transition-transform duration-7000 ease-out ${
               i === index ? "scale-100" : "scale-105"
             }`}
           />
         </div>
       ))}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-espresso/90 via-espresso/55 to-espresso/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-espresso/90 via-espresso/20 to-espresso/35" />
+      <div className="absolute inset-0 bg-linear-to-r from-espresso/90 via-espresso/55 to-espresso/10" />
+      <div className="absolute inset-0 bg-linear-to-t from-espresso/90 via-espresso/20 to-espresso/35" />
 
-      <div className="relative mx-auto flex min-h-[calc(100svh-6.65rem)] max-w-[1400px] flex-col justify-between px-5 pb-8 pt-8 sm:px-8 sm:pb-10 lg:px-12 lg:pb-12">
+      <div className="relative mx-auto flex min-h-[calc(100svh-6.65rem)] max-w-350 flex-col justify-between px-5 pb-8 pt-8 sm:px-8 sm:pb-10 lg:px-12 lg:pb-12">
         <div className="flex items-start justify-between gap-6">
           <div className="inline-flex items-center gap-2.5 rounded-full border border-ivory/20 bg-espresso/25 px-4 py-2 backdrop-blur-md">
             <span className="relative flex size-2">
@@ -147,12 +147,12 @@ export default function Hero() {
               <ArrowUpRight className="size-4" strokeWidth={1.8} />
             </Link>
 
-            <Link
-              href="/services"
-              className={`${buttonVariants({ variant: "light", size: "lg" })} min-h-12 w-full justify-center px-5 backdrop-blur-sm sm:w-auto`}
-            >
-              Explore the menu
-            </Link>
+           <Link
+  href="/services"
+  className={`${buttonVariants({ variant: "outline", size: "lg" })} min-h-12 w-full justify-center px-5 backdrop-blur-sm sm:w-auto`}
+>
+  Explore the menu
+</Link>
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export default function Hero() {
                   type="button"
                   onClick={() => setIndex(i)}
                   aria-label={`Go to film scene ${i + 1}`}
-                  className="group relative h-[2px] flex-1 overflow-hidden rounded-full bg-ivory/20"
+                  className="group relative h-0.5 flex-1 overflow-hidden rounded-full bg-ivory/20"
                 >
                   <span
                     key={`${i}-${index}-${playing}`}

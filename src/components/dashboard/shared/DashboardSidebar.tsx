@@ -1,4 +1,6 @@
+
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -35,34 +37,31 @@ type UserRole = "user" | "admin";
 // Define sidebar item structure.
 type NavItem = {
   title: string;
-  href?: string;
+  href: string;
   icon: LucideIcon;
 };
 
-// Define sidebar user props.
+// Receive the role from the server layout.
 type DashboardSidebarProps = {
-  user?: {
-    role?: UserRole;
-  } | null;
+  role: UserRole;
 };
-
 
 // Define navigation items for each role.
 const roleBasedSidebarItems: Record<UserRole, NavItem[]> = {
   user: [
     {
       title: "Overview",
-      href: "/dashboard",
+      href: "/dashboard/user",
       icon: LayoutDashboard,
     },
     {
       title: "My Appointments",
-      href: "/dashboard/my-appointments",
+      href: "/dashboard/user/my-appointments",
       icon: CalendarDays,
     },
     {
       title: "My Profile",
-      href: "/dashboard/my-profile",
+      href: "/dashboard/user/my-profile",
       icon: UserRound,
     },
   ],
@@ -70,37 +69,37 @@ const roleBasedSidebarItems: Record<UserRole, NavItem[]> = {
   admin: [
     {
       title: "Overview",
-      href: "/dashboard",
+      href: "/dashboard/admin",
       icon: LayoutDashboard,
     },
     {
       title: "Manage Services",
-      href: "/dashboard/manage-services",
+      href: "/dashboard/admin/manage-services",
       icon: Scissors,
     },
     {
       title: "Add/Update Service",
-      href: "/dashboard/manage-services/add",
+      href: "/dashboard/admin/manage-services/add",
       icon: PlusCircle,
     },
     {
       title: "Manage Appointments",
-      href: "/dashboard/manage-appointments",
+      href: "/dashboard/admin/manage-appointments",
       icon: CalendarDays,
     },
     {
       title: "Manage Users",
-      href: "/dashboard/manage-users",
+      href: "/dashboard/admin/manage-users",
       icon: Users,
     },
     {
       title: "Transactions",
-      href: "/dashboard/transactions",
+      href: "/dashboard/admin/transactions",
       icon: Receipt,
     },
     {
       title: "My Profile",
-      href: "/dashboard/my-profile",
+      href: "/dashboard/admin/my-profile",
       icon: UserRound,
     },
   ],
@@ -114,16 +113,18 @@ const footerItemClass =
   "h-10 gap-3 rounded-xl px-3 text-[0.8rem] font-medium text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground";
 
 export default function DashboardSidebar({
-  user,
+  role,
 }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { toggleSidebar } = useSidebar();
 
-  // Default to user role when no role is available.
-  const role = user?.role ?? "user";
-
-  // Get navigation items based on the current role.
+  // Get navigation items based on the user role.
   const sidebarItems = roleBasedSidebarItems[role];
+
+  // Highlight the most specific route that matches the current path.
+  const activeHref = sidebarItems
+    .filter(({ href }) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <TooltipProvider>
@@ -132,7 +133,7 @@ export default function DashboardSidebar({
         <SidebarHeader className="gap-0 p-0">
           <div className="flex items-center px-5 py-6 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:py-4">
             <Link
-              href="/dashboard"
+              href="/"
               className="flex min-w-0 items-center gap-3"
             >
               {/* Brand icon */}
@@ -167,8 +168,8 @@ export default function DashboardSidebar({
                 {sidebarItems.map(({ title, href, icon: Icon }) => (
                   <SidebarMenuItem key={title}>
                     <SidebarMenuButton
-                      render={href ? <Link href={href} /> : undefined}
-                      isActive={Boolean(href) && pathname === href}
+                      render={<Link href={href} />}
+                      isActive={activeHref === href}
                       tooltip={title}
                       className={navItemClass}
                     >
