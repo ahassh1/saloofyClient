@@ -10,9 +10,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # SalonBook — Project Instructions & Progress
 
-**Last updated:** 2026-11-22
-**Current phase:** Phase 1 — client foundation and authentication (partially complete). The Express API has not been started.
-**Current task status:** Customer dashboard client pages are implemented against the documented Express API contract. Editor diagnostics found no issues, but lint/build and browser validation remain pending; the Express backend is still missing.
+**Last updated:** 2026-11-27
+**Current phase:** Phase 1 — client foundation and authentication (partially complete). The separate Express API exists and is being connected to the client.
+**Current task status:** Stripe Checkout and webhook code plus payment return pages are implemented, and all 8 server tests pass. Client lint/build are blocked by pre-existing NUL-byte files; live Stripe + MongoDB webhook testing remains.
 
 > Read this entire file before every task. This file is the single source of truth for scope, architecture, data rules, conventions, and progress. If a request conflicts with this file, stop and ask the user before proceeding.
 
@@ -30,7 +30,7 @@ SalonBook is a salon appointment booking platform with two roles:
 | Layer | Technology | Location |
 | --- | --- | --- |
 | Client | Next.js App Router, TypeScript, Tailwind CSS v4, shadcn/base-ui | `E:\saloofy` (this repository) |
-| API | Express.js, TypeScript, REST | Separate `saloofy-server` repository (not created yet) |
+| API | Express.js, JavaScript, REST | Separate existing repository at `E:\saloofyServer` |
 | Database | MongoDB | Shared by client auth and Express API |
 | Authentication | Better Auth (email/password + Google) | Better Auth lives in the Next.js app |
 | Authorization | JWT verified by Express + role checks in Next.js | Client and server |
@@ -112,9 +112,11 @@ src/
   lib/                       auth, auth client, utilities, date helpers
 ```
 
-### 4.2 Server repository (planned, not created)
+### 4.2 Server repository (existing)
 
-Create a **separate** Express repository when the user requests it (for example `E:\saloofy-server`). Suggested simple structure:
+Keep Express code in the separate `E:\saloofyServer` repository. Its current
+route modules and direct MongoDB access should follow that repository's
+`agent.md` conventions; do not move server code into this client repository.
 
 ```
 src/
@@ -419,8 +421,8 @@ Create these with the server setup/seed step. Use a small script or documented m
    - line item name/description from the service,
    - amount and currency,
    - `metadata.appointmentId` and `metadata.userId`,
-   - success URL back to the customer appointments page with a success flag,
-   - cancel URL back to the appointments page with a cancelled flag.
+   - success URL to the client Payment Success page,
+   - cancel URL to the client Payment Cancel page.
 5. Express returns the Checkout Session URL; the client redirects the browser to Stripe.
 6. After payment, Stripe redirects to the success URL. The redirect alone does **not** prove payment.
 
@@ -525,6 +527,8 @@ The client uses `NEXT_PUBLIC_API_URL` to reach Express. Better Auth endpoints re
 | `/` | Existing UI | Professional salon landing page; links must work |
 | `/services` | **Missing** (navbar link currently 404s) | Browse active services, search by name, category filter, price sort, loading/empty/error states |
 | `/services/[id]` | **Missing** | Service details with image, category, price, duration, description, and a book action |
+| `/payment/success` | Implemented | Explain payment is pending verified webhook confirmation; link to appointments |
+| `/payment/cancel` | Implemented | Explain no payment was confirmed; link back to appointments |
 | `/signin` | Existing UI + auth | Email/password and Google sign-in; links to signup |
 | `/signup` | Existing UI + auth | Email/password and Google signup; no admin option; links to signin |
 
@@ -535,7 +539,7 @@ Public pages show only active services. Guests who try to book are sent to `/sig
 | Route | Status | Required behavior |
 | --- | --- | --- |
 | `/dashboard/user` | Placeholder | Overview: upcoming appointments, pending count, paid count, recent activity, quick links |
-| `/dashboard/user/my-appointments` | Placeholder | Own appointments with service, date, slot, status/payment badges; cancel pending; pay confirmed/unpaid; empty state |
+| `/dashboard/user/my-appointments` | Implemented; API partial | Own appointments with service/date/status/payment, cancel pending, and pay confirmed/unpaid |
 | `/dashboard/user/my-profile` | Placeholder | View/update name and image; show email and role; sign-out |
 
 ### 11.3 Admin dashboard
@@ -711,7 +715,7 @@ Then update Section 16 of this file.
 
 **Snapshot date:** 2026-11-27
 **Latest commit:** `fbf6a1d` — “part-2: added role base dashboard navigatation & hidration, hooks ihssue resolved”
-**Uncommitted changes:** previously documented protected-route and sidebar changes, plus the customer dashboard pages, appointment API helper/hook, Better Auth JWT plugin configuration, and a VS Code validation task.
+**Uncommitted changes:** Stripe Checkout/webhook routes in `E:\saloofyServer`, payment return pages in the client, and related appointment/API/documentation updates.
 
 ### 16.1 Completed
 
@@ -736,6 +740,8 @@ Then update Section 16 of this file.
 - ✅ `/blocked` notice page with a server-side session re-check and sign-out action.
 - ✅ Reusable `requireApiUser()` / `requireApiAdmin()` guards for future route handlers.
 - ✅ Fixed the pre-existing `Download.tsx` invalid `buttonVariants({ variant: "light" })` type error that blocked `next build` (now `outline`).
+- ✅ Added Stripe Checkout and webhook routes in `E:\saloofyServer`; only a verified paid webhook records a transaction and marks the appointment paid.
+- ✅ Added customer appointment listing compatibility for the client and payment success/cancel return pages.
 
 ### 16.2 In progress / partial
 
@@ -744,7 +750,7 @@ Then update Section 16 of this file.
 - 🟡 Service browsing component is a placeholder (`src/components/services/service-browser.tsx`).
 - 🟡 Authentication flows work, but sign-in/sign-up feedback and logging still need cleanup (see known issues).
 - 🟡 Role guards run per layout, not on every client navigation inside the same role area; future data access must re-verify the session (DAL pattern).
-- 🟡 Customer appointment pages are wired to the planned API contract but cannot load or mutate appointment data until the Express API is created.
+- 🟡 Customer appointment payment flow is wired to the existing Express API; broader appointment actions still need endpoint compatibility checks.
 - 🟡 Customer dashboard overview and profile form are implemented; lint/build and browser validation are still pending.
 - 🟡 Better Auth JWT plugin is configured for the planned Express API; runtime token issuance has not been verified.
 
@@ -757,11 +763,11 @@ Then update Section 16 of this file.
 
 **Server foundation**
 
-- ⬜ Create the separate Express + TypeScript repository with README and `.env.example`.
-- ⬜ Add environment validation, MongoDB connection, CORS, JSON parsing, error handler, and `/api/health`.
-- ⬜ Add Better Auth JWT plugin/JWKS configuration on the client.
-- ⬜ Add Express JWT verification, user loading, role guard, and blocked-user guard.
-- ⬜ Create collections/indexes and an admin seed/promotion script.
+- ✅ Separate Express server repository exists with README and `.env.example`.
+- ✅ Server environment validation, MongoDB connection, CORS, JSON parsing, error handler, and `/api/health` exist.
+- ✅ Client Better Auth JWT plugin/JWKS configuration exists.
+- ✅ Express JWT verification, user loading, role guard, and blocked-user checks exist.
+- 🟡 Collections/indexes and `promote-admin` exist; verify complete alignment with the canonical data model.
 
 **Services**
 
@@ -775,8 +781,7 @@ Then update Section 16 of this file.
 **Appointments and users**
 
 - ⬜ Appointment creation API with all validation, duplicate protection, and server-forced statuses.
-- ⬜ Express appointment endpoints for customer-owned appointment listing and pending cancellation.
-- ⬜ Express Stripe Checkout endpoint and verified webhook.
+- 🟡 Customer appointment list is connected; add/align the pending-cancellation endpoint.
 - ⬜ Admin appointments page: list, filter, confirm, cancel.
 - ⬜ Admin users page: list, search, block/unblock.
 - ⬜ Admin profile page with Better Auth profile updates.
@@ -784,15 +789,14 @@ Then update Section 16 of this file.
 
 **Payments**
 
-- ⬜ Stripe Checkout Session endpoint.
-- ⬜ Stripe webhook with raw-body signature verification, idempotency, and atomic writes.
+- 🟡 Stripe Checkout Session endpoint and verified webhook implemented; unit/API tests pass, but live Stripe + MongoDB transaction testing remains.
 - ⬜ Customer payment history page.
 - ⬜ Admin transactions page.
 - ⬜ End-to-end payment testing with Stripe CLI.
 
 **Quality and delivery**
 
-- ⬜ Run lint/build and manually verify the customer dashboard when the client can be started; appointment actions additionally require the Express API.
+- ⬜ Resolve existing NUL-byte client files, then pass lint/build and manually verify the payment return pages.
 - ⬜ Loading skeletons, empty states, error states, confirmation dialogs, and status badges everywhere required.
 - ⬜ Full responsive and accessibility pass.
 - ⬜ Remove debug logs and placeholder copy.
@@ -804,9 +808,8 @@ Then update Section 16 of this file.
 
 **High priority**
 
-1. ⚠️ **Missing Express backend.** There is no Express repository yet, so no REST API, JWT verification, server-side role enforcement, Stripe flow, ImgBB upload, or MongoDB app collections. The new `src/lib/api-auth.ts` helpers only protect Next.js route handlers; Express must implement the JWT + role + blocked middleware from Section 6.3.
+1. ⚠️ **Server/client API coverage is incomplete.** `E:\saloofyServer` exists and now supports Stripe Checkout, but several client/admin routes and flows remain unimplemented or use different response shapes.
 2. ⚠️ **`/services` is a dead link.** The navbar links to `/services`, but no route exists. The service browser component is still a placeholder.
-3. ⚠️ **No admin seed/promotion script.** Admin promotion must remain a trusted server/database action; no such script exists yet.
 
 **Medium priority**
 
@@ -816,7 +819,7 @@ Then update Section 16 of this file.
 7. ⚠️ **Profile-image upload UI is non-functional.** Sign-up shows upload/URL controls, but only the URL path is sent; no ImgBB upload exists.
 8. ⚠️ **No confirmation dialog primitive installed.** Required destructive-action dialogs will need the shadcn alert-dialog component when that step is approved.
 9. ⚠️ **Existing uncommitted sidebar change.** `DashboardSidebar.tsx` was modified before the protected-routes task. Review it before editing that file.
-10. ⚠️ **Admin dashboard pages remain placeholders** and show static text. Customer appointment data/actions remain unavailable until the Express API is implemented; the new client pages have not yet passed lint/build or browser validation.
+10. ⚠️ **Admin dashboard pages remain placeholders** and show static text. Customer appointment list/payment are connected, but other actions remain partial.
 11. ⚠️ **Blocked users can still sign in.** They are redirected to `/blocked` and cannot use dashboards, but no Better Auth hook revokes their sessions yet; blocking must also be enforced by every future API call.
 
 **Policy/scope questions (do not invent behavior)**
@@ -826,12 +829,11 @@ Then update Section 16 of this file.
 14. ⚠️ **Global slot capacity:** the brief only requires preventing duplicate active bookings for the same date/time slot; it does not define whether the salon can serve multiple customers in one slot. The current rule is per-customer. Confirm before adding capacity logic.
 15. ⚠️ **Service deletion with history:** hard deletion is blocked when appointments reference the service; admins are directed to deactivate. Confirm this interpretation if a strict hard-delete is required.
 16. ⚠️ **Unsplash/placeholder content:** home and auth pages use stock imagery and placeholder social links. Replace only with approved assets.
+17. ⚠️ **Existing client source files contain NUL bytes.** This causes current lint/build parsing failures in unrelated pages; they were not modified as part of payment work.
 
 ### 16.5 Next step
 
-**No implementation has started.** Await an explicit request for the next step.
-
-Recommended next step (not started): **create the separate Express server repository skeleton** with environment validation, MongoDB connection, CORS, centralized error handling, `/api/health`, and the Better Auth JWT + role + blocked-user middleware. The client foundation now provides current `role` and `blocked` values in the session and reusable Next.js server guards; the Express API must repeat those checks per request.
+Run a real Stripe test-mode checkout with MongoDB running as a replica set, then replay the webhook and confirm one transaction is created. After that, continue aligning remaining customer/admin client actions with `E:\saloofyServer`.
 
 ---
 
