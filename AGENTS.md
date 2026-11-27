@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **Last updated:** 2026-11-27
 **Current phase:** Phase 1 — client foundation and authentication (partially complete). The separate Express API exists and is being connected to the client.
-**Current task status:** Stripe Checkout/webhook code and payment return pages are implemented; loading and error feedback have been improved. Focused client lint and server tests pass; full client lint/build remain blocked by pre-existing issues.
+**Current task status:** Service browsing now has a restored `/services` page and API-backed name search, category filter, and price sorting. Focused client lint and server tests pass; browser validation and full client lint/build remain pending or blocked by pre-existing issues.
 
 > Read this entire file before every task. This file is the single source of truth for scope, architecture, data rules, conventions, and progress. If a request conflicts with this file, stop and ask the user before proceeding.
 
@@ -715,7 +715,7 @@ Then update Section 16 of this file.
 
 **Snapshot date:** 2026-11-27
 **Latest commit:** `fbf6a1d` — “part-2: added role base dashboard navigatation & hidration, hooks ihssue resolved”
-**Uncommitted changes:** Stripe Checkout/webhook routes and clearer upload/checkout errors in `E:\saloofyServer`, client payment return/error feedback, and related appointment/API/documentation updates.
+**Uncommitted changes:** Service browse/search/sort updates, Stripe Checkout/webhook routes and clearer upload/checkout errors in `E:\saloofyServer`, client payment/error feedback, and related appointment/API/documentation updates.
 
 ### 16.1 Completed
 
@@ -748,7 +748,7 @@ Then update Section 16 of this file.
 
 - 🟡 Dashboard sidebar refinement (uncommitted `DashboardSidebar.tsx` change).
 - 🟡 Dashboard pages render placeholders only; no real data.
-- 🟡 Service browsing component is a placeholder (`src/components/services/service-browser.tsx`).
+- 🟡 Service browsing now supports API-backed name search, category filtering, and price sorting; browser validation remains pending.
 - 🟡 Authentication flows work, but sign-in/sign-up feedback and logging still need cleanup (see known issues).
 - 🟡 Role guards run per layout, not on every client navigation inside the same role area; future data access must re-verify the session (DAL pattern).
 - 🟡 Customer appointment payment flow is wired to the existing Express API; broader appointment actions still need endpoint compatibility checks.
@@ -775,9 +775,9 @@ Then update Section 16 of this file.
 
 **Services**
 
-- 🟡 Current API supports basic service listing, image upload, and create/update; search/filter/sort, admin listing, delete, and status toggle remain.
+- 🟡 Public service API supports name search, category filtering, and price sorting; admin listing, delete, and status toggle remain.
 - 🟡 ImgBB upload validation and API failure handling are implemented; live provider verification remains.
-- ⬜ Public `/services` page wired to the API.
+- 🟡 Public `/services` page is restored and wired to the API; browser verification remains.
 - ⬜ Service details page and booking entry point.
 - ⬜ Admin manage-services page with real data.
 - 🟡 Admin add/edit form is wired to the current create/update/upload endpoints; inactive-service editing and browser validation remain.
@@ -814,7 +814,7 @@ Then update Section 16 of this file.
 **High priority**
 
 1. ⚠️ **Server/client API coverage is incomplete.** `E:\saloofyServer` exists and now supports Stripe Checkout, but several client/admin routes remain unimplemented. Service listing/status/delete management and editing inactive services are not supported by the current API.
-2. ⚠️ **`/services` is a dead link.** The navbar links to `/services`, but no route exists. The service browser component is still a placeholder.
+2. ⚠️ **Service details route is unusable.** The `/services/[id]` page source contains NUL bytes, so service cards cannot open working detail pages until that file is repaired.
 
 **Medium priority**
 
@@ -837,7 +837,7 @@ Then update Section 16 of this file.
 
 ### 16.5 Next step
 
-Run a real Stripe test-mode checkout with MongoDB running as a replica set, then replay the webhook and confirm one transaction is created. After that, continue aligning remaining customer/admin client actions with `E:\saloofyServer`.
+Manually verify `/services` search, category filtering, and both price-sort directions at mobile and desktop widths. Then repair the corrupted `/services/[id]` page so service cards lead to working details.
 
 ---
 
