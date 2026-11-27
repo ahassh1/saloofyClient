@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  customerApiFetch,
-  type CustomerAppointment,
-} from "@/lib/customer-api";
+import { apiFetch, type CustomerAppointment } from "@/lib/api";
 
 export function useCustomerAppointments() {
   const [appointments, setAppointments] = useState<CustomerAppointment[]>([]);
@@ -21,7 +18,7 @@ export function useCustomerAppointments() {
       setError(null);
 
       try {
-        const result = await customerApiFetch<CustomerAppointment[]>(
+        const result = await apiFetch<CustomerAppointment[]>(
           "/api/appointments/my",
         );
 

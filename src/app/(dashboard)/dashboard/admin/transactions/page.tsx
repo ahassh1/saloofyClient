@@ -1,9 +1,5 @@
-const AdminTransactions = () => {
-  return (
-    <div>
-      admin transactions
-    </div>
-  );
-};
+import AdminTransactions from "@/components/dashboard/admin/AdminTransactions";
 
-export default AdminTransactions;
+export default function AdminTransactionsPage() {
+  return <AdminTransactions />;
+}

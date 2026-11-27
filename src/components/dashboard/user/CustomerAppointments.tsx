@@ -7,33 +7,18 @@ import { CalendarDays, Clock3, LoaderCircle, Scissors } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCustomerAppointments } from "@/hooks/use-customer-appointments";
-import { customerApiFetch, type CustomerAppointment } from "@/lib/customer-api";
+import { apiFetch, type CustomerAppointment } from "@/lib/api";
+import {
+  formatAppointmentDate,
+  formatMoney,
+  formatRequestDate,
+} from "@/lib/formatters";
 
 const statusStyles = {
   pending: "bg-amber-100 text-amber-900",
   confirmed: "bg-emerald-100 text-emerald-900",
   cancelled: "bg-rose-100 text-rose-900",
 };
-
-function formatAppointmentDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-    new Date(year, month - 1, day, 12),
-  );
-}
-
-function formatRequestDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-    new Date(value),
-  );
-}
-
-function formatPrice(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-}
 
 export default function CustomerAppointments() {
   const { appointments, loading, error, reload } = useCustomerAppointments();
@@ -46,7 +31,7 @@ export default function CustomerAppointments() {
     setActiveAction(appointment._id);
 
     try {
-      await customerApiFetch<null>(
+      await apiFetch<null>(
         `/api/appointments/${encodeURIComponent(appointment._id)}/cancel`,
         { method: "PATCH" },
       );
@@ -74,7 +59,7 @@ export default function CustomerAppointments() {
     setActiveAction(appointment._id);
 
     try {
-      const checkout = await customerApiFetch<{ url: string }>(
+      const checkout = await apiFetch<{ url: string }>(
         "/api/payments/checkout",
         {
           method: "POST",
@@ -223,7 +208,7 @@ export default function CustomerAppointments() {
                           : ""}
                       </p>
                       <p className="font-semibold text-espresso">
-                        {formatPrice(appointment.service.price)}
+                        {formatMoney(appointment.service.price)}
                       </p>
                     </div>
 
@@ -238,6 +223,14 @@ export default function CustomerAppointments() {
                       <div className="mt-3 space-y-2 text-sm text-mocha">
                         {appointment.service.description && (
                           <p>{appointment.service.description}</p>
+                        )}
+                        {appointment.message && (
+                          <p>
+                            <span className="font-semibold text-espresso">
+                              Your message:
+                            </span>{" "}
+                            {appointment.message}
+                          </p>
                         )}
                         <p>Appointment ID: {appointment._id}</p>
                       </div>

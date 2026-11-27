@@ -1,5 +1,5 @@
-import CustomerProfile from "@/components/dashboard/user/CustomerProfile";
+import AccountProfile from "@/components/dashboard/shared/AccountProfile";
 
 export default function UserMyProfile() {
-  return <CustomerProfile />;
+  return <AccountProfile />;
 }

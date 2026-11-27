@@ -7,21 +7,24 @@ import { toast } from "sonner";
 import SignOutButton from "@/components/auth/SignOutButton";
 import { authClient, useSession } from "@/lib/auth-client";
 
-export default function CustomerProfile() {
+export default function AccountProfile() {
   const { data: session, isPending, refetch } = useSession();
   const user = session?.user;
   const userId = user?.id;
   const userName = user?.name;
   const userImage = user?.image;
+  const userPhone = user?.phone;
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
+  const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
     setName(userName ?? "");
     setImage(userImage ?? "");
-  }, [userId, userName, userImage]);
+    setPhone(userPhone ?? "");
+  }, [userId, userName, userImage, userPhone]);
 
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,6 +41,7 @@ export default function CustomerProfile() {
       const { error } = await authClient.updateUser({
         name: updatedName,
         image: image.trim() || null,
+        phone: phone.trim() || undefined,
       });
 
       if (error) {
@@ -136,6 +140,20 @@ export default function CustomerProfile() {
               value={user.email}
               readOnly
               className="field cursor-not-allowed opacity-70"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="profile-phone" className="field-label">
+              Phone number
+            </label>
+            <input
+              id="profile-phone"
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              className="field"
             />
           </div>
 

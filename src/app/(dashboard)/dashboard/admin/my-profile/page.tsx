@@ -1,9 +1,5 @@
-const AdminMyProfile = () => {
-  return (
-    <div>
-      admin my profile
-    </div>
-  );
-};
+import AccountProfile from "@/components/dashboard/shared/AccountProfile";
 
-export default AdminMyProfile;
+export default function AdminMyProfile() {
+  return <AccountProfile />;
+}

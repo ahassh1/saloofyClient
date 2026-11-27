@@ -1,5 +1,17 @@
 export type AppointmentStatus = "pending" | "confirmed" | "cancelled";
 export type PaymentStatus = "unpaid" | "paid";
+export type ServiceCategory = "Hair" | "Skin" | "Nails" | "Makeup" | "Bridal";
+
+export type SalonService = {
+  _id: string;
+  name: string;
+  category: ServiceCategory;
+  description: string;
+  price: number;
+  durationMinutes: number;
+  imageUrl: string;
+  isActive: boolean;
+};
 
 export type CustomerAppointment = {
   _id: string;
@@ -7,15 +19,34 @@ export type CustomerAppointment = {
   timeSlot: string;
   status: AppointmentStatus;
   paymentStatus: PaymentStatus;
+  message?: string;
   createdAt: string;
-  service: {
-    name: string;
-    category: string;
-    price: number;
-    imageUrl: string;
-    description?: string;
-    durationMinutes?: number;
-  };
+  service: SalonService;
+};
+
+export type CustomerSummary = {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  phone?: string;
+  blocked?: boolean;
+};
+
+export type AdminAppointment = CustomerAppointment & {
+  customer: CustomerSummary;
+};
+
+export type AdminTransaction = {
+  _id: string;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  stripeSessionId: string;
+  createdAt: string;
+  customer: CustomerSummary;
+  service: Pick<SalonService, "name">;
+  appointment: Pick<CustomerAppointment, "appointmentDate" | "timeSlot">;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -41,9 +72,10 @@ async function getAccessToken(): Promise<string> {
   return body.token;
 }
 
-export async function customerApiFetch<T>(
+async function requestApi<T>(
   path: string,
-  options: RequestInit = {},
+  options: RequestInit,
+  authenticated: boolean,
 ): Promise<T> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -51,23 +83,24 @@ export async function customerApiFetch<T>(
     throw new Error("Set NEXT_PUBLIC_API_URL to connect to the appointment service.");
   }
 
-  const token = await getAccessToken();
   const headers = new Headers(options.headers);
   headers.set("Accept", "application/json");
-  headers.set("Authorization", `Bearer ${token}`);
 
-  if (options.body) {
+  if (authenticated) {
+    headers.set("Authorization", `Bearer ${await getAccessToken()}`);
+  }
+
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
+  if (options.body && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(
-    `${apiUrl.replace(/\/+$/, "")}${path}`,
-    {
-      ...options,
-      headers,
-      credentials: "omit",
-    },
-  );
+  const response = await fetch(`${apiUrl.replace(/\/+$/, "")}${path}`, {
+    ...options,
+    headers,
+    credentials: "omit",
+  });
   const body: unknown = await response.json();
 
   if (!response.ok) {
@@ -84,4 +117,18 @@ export async function customerApiFetch<T>(
   }
 
   return body.data as T;
+}
+
+export function apiFetch<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return requestApi<T>(path, options, true);
+}
+
+export function publicApiFetch<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return requestApi<T>(path, options, false);
 }
