@@ -1,9 +1,5 @@
-
 import { Suspense } from "react";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
 import DashboardSidebar from "@/components/dashboard/shared/DashboardSidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -11,36 +7,35 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { requireAuthenticatedUser } from "@/lib/auth-guard";
 
-type UserRole = "user" | "admin";
+// Reading the session blocks this segment, so it cannot be "instant".
+export const instant = false;
 
-// Fetch session and render the role-based sidebar.
-async function DashboardSidebarWithSession() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+// Loading shell shown while the session is verified on the server.
+function DashboardShellFallback() {
+  return (
+    <div className="flex min-h-dvh w-full">
+      <div className="hidden w-16 animate-pulse bg-sidebar sm:block" />
 
-  // Redirect unauthenticated users.
-  if (!session) redirect("/login");
-
-  const role = (session.user.role ?? "user") as UserRole;
-
-  return <DashboardSidebar role={role} />;
+      <div className="flex-1 space-y-4 p-5 sm:p-7 lg:p-10">
+        <div className="h-8 w-40 animate-pulse rounded-lg bg-sand" />
+        <div className="h-24 w-full animate-pulse rounded-xl bg-sand/60" />
+      </div>
+    </div>
+  );
 }
 
-export default function DashboardLayout({
+// The guard runs BEFORE `children` is rendered, so protected pages never
+// render for a guest or a blocked account.
+async function DashboardShell({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const user = await requireAuthenticatedUser();
+
   return (
     <SidebarProvider>
-      {/* Load the authenticated sidebar separately. */}
-      <Suspense
-        fallback={
-          <div className="w-16 animate-pulse bg-sidebar" />
-        }
-      >
-        <DashboardSidebarWithSession />
-      </Suspense>
+      <DashboardSidebar role={user.role} />
 
       <SidebarInset>
         {/* Mobile dashboard header */}
@@ -54,10 +49,18 @@ export default function DashboardLayout({
         </header>
 
         {/* Dashboard page content */}
-        <main className="flex-1 p-5 sm:p-7 lg:p-10">
-          {children}
-        </main>
+        <main className="flex-1 p-5 sm:p-7 lg:p-10">{children}</main>
       </SidebarInset>
     </SidebarProvider>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <Suspense fallback={<DashboardShellFallback />}>
+      <DashboardShell>{children}</DashboardShell>
+    </Suspense>
   );
 }

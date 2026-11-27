@@ -354,7 +354,7 @@ export default function Download() {
         <div className="hidden justify-end lg:col-span-2 lg:flex">
           <Link
             href="/booking"
-            className={buttonVariants({ variant: "light", size: "sm" })}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             Prefer the web? Book here
             <ArrowUpRight className="size-3.5" />

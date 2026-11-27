@@ -18,7 +18,14 @@ export const auth = betterAuth({
               type: ["user", "admin"],
               input: false,
               defaultValue: 'user'
-            } 
+            },
+          // Blocked users keep their account but lose access to protected
+          // features. `input: false` stops clients from changing this field.
+          blocked: {
+              type: "boolean",
+              input: false,
+              defaultValue: false
+            }
         }
     },
     socialProviders: {

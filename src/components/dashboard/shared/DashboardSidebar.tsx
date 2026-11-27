@@ -102,7 +102,7 @@ const roleBasedSidebarItems: Record<UserRole, NavItem[]> = {
       href: "/dashboard/admin/my-profile",
       icon: UserRound,
     },
-  ],
+  ], 
 };
 
 // Keep navigation styles consistent.
@@ -135,7 +135,7 @@ export default function DashboardSidebar({
             <Link
               href="/"
               className="flex min-w-0 items-center gap-3"
-            >
+            > 
               {/* Brand icon */}
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 ring-1 ring-gold/40">
                 <span className="size-2.5 rotate-45 bg-gold" />
@@ -146,7 +146,7 @@ export default function DashboardSidebar({
                 Saloo<span className="text-gold">fy</span>
               </span>
             </Link>
-          </div>
+        </div>
 
           {/* Dashboard heading */}
           <div className="px-5 pt-6 pb-2 group-data-[collapsible=icon]:hidden">
