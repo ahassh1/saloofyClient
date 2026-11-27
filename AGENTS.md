@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **Last updated:** 2026-11-27
 **Current phase:** Phase 1 — client foundation and authentication (partially complete). The separate Express API exists and is being connected to the client.
-**Current task status:** Stripe Checkout/webhook code and payment return pages are implemented; service, customer dashboard, booking, and checkout waits now have clear loading feedback. Server tests pass; client lint/build remain blocked by pre-existing NUL-byte files.
+**Current task status:** Stripe Checkout/webhook code and payment return pages are implemented; loading and error feedback have been improved. Focused client lint and server tests pass; full client lint/build remain blocked by pre-existing issues.
 
 > Read this entire file before every task. This file is the single source of truth for scope, architecture, data rules, conventions, and progress. If a request conflicts with this file, stop and ask the user before proceeding.
 
@@ -715,7 +715,7 @@ Then update Section 16 of this file.
 
 **Snapshot date:** 2026-11-27
 **Latest commit:** `fbf6a1d` — “part-2: added role base dashboard navigatation & hidration, hooks ihssue resolved”
-**Uncommitted changes:** Stripe Checkout/webhook routes in `E:\saloofyServer`, payment return pages in the client, and related appointment/API/documentation updates.
+**Uncommitted changes:** Stripe Checkout/webhook routes and clearer upload/checkout errors in `E:\saloofyServer`, client payment return/error feedback, and related appointment/API/documentation updates.
 
 ### 16.1 Completed
 
@@ -742,6 +742,7 @@ Then update Section 16 of this file.
 - ✅ Fixed the pre-existing `Download.tsx` invalid `buttonVariants({ variant: "light" })` type error that blocked `next build` (now `outline`).
 - ✅ Added Stripe Checkout and webhook routes in `E:\saloofyServer`; only a verified paid webhook records a transaction and marks the appointment paid.
 - ✅ Added customer appointment listing compatibility for the client and payment success/cancel return pages.
+- ✅ Added a branded 404 page, clearer API connection/response errors, explicit signup toasts, and client-compatible appointment input names.
 
 ### 16.2 In progress / partial
 
@@ -752,6 +753,8 @@ Then update Section 16 of this file.
 - 🟡 Role guards run per layout, not on every client navigation inside the same role area; future data access must re-verify the session (DAL pattern).
 - 🟡 Customer appointment payment flow is wired to the existing Express API; broader appointment actions still need endpoint compatibility checks.
 - 🟡 Labeled loading states are present for service fetching, customer dashboard/appointment data, booking submissions, and checkout; admin dashboard loading remains unverified because its source file contains NUL bytes.
+- 🟡 API error feedback now handles network/non-JSON responses; server upload and Stripe Checkout failures return clearer errors. Focused client lint and server tests pass, but full lint/build and browser checks remain blocked or pending.
+- 🟡 Admin service form now uses the server's separate image-upload endpoint and JSON create/update routes; inactive-service editing and the full admin service-management API remain incomplete.
 - 🟡 Customer dashboard overview and profile form are implemented; lint/build and browser validation are still pending.
 - 🟡 Better Auth JWT plugin is configured for the planned Express API; runtime token issuance has not been verified.
 
@@ -772,12 +775,12 @@ Then update Section 16 of this file.
 
 **Services**
 
-- ⬜ Services API: public list/search/filter/sort, public details, admin CRUD, status toggle.
-- ⬜ ImgBB upload integration with validation and failure handling.
+- 🟡 Current API supports basic service listing, image upload, and create/update; search/filter/sort, admin listing, delete, and status toggle remain.
+- 🟡 ImgBB upload validation and API failure handling are implemented; live provider verification remains.
 - ⬜ Public `/services` page wired to the API.
 - ⬜ Service details page and booking entry point.
 - ⬜ Admin manage-services page with real data.
-- ⬜ Admin add-service and edit-service forms.
+- 🟡 Admin add/edit form is wired to the current create/update/upload endpoints; inactive-service editing and browser validation remain.
 
 **Appointments and users**
 
@@ -798,6 +801,7 @@ Then update Section 16 of this file.
 **Quality and delivery**
 
 - ⬜ Resolve existing NUL-byte client files, then pass lint/build and manually verify the payment return pages.
+- ⬜ Manually verify the 404, signup errors, booking conflict, image-upload failure, and Stripe Checkout failure feedback.
 - 🟡 Loading feedback added for services, customer dashboard/appointments, booking, and checkout; remaining dashboard states and confirmation dialogs still need implementation.
 - ⬜ Full responsive and accessibility pass.
 - ⬜ Remove debug logs and placeholder copy.
@@ -809,14 +813,13 @@ Then update Section 16 of this file.
 
 **High priority**
 
-1. ⚠️ **Server/client API coverage is incomplete.** `E:\saloofyServer` exists and now supports Stripe Checkout, but several client/admin routes and flows remain unimplemented or use different response shapes.
+1. ⚠️ **Server/client API coverage is incomplete.** `E:\saloofyServer` exists and now supports Stripe Checkout, but several client/admin routes remain unimplemented. Service listing/status/delete management and editing inactive services are not supported by the current API.
 2. ⚠️ **`/services` is a dead link.** The navbar links to `/services`, but no route exists. The service browser component is still a placeholder.
 
 **Medium priority**
 
 4. ⚠️ **Branding inconsistency.** The brief says SalonBook; the folder and some UI say “Saloofy”. Decide before final polish.
-5. ⚠️ **Toast usage is inconsistent.** Sign-in/sign-up use neutral `toast(...)` for errors instead of `toast.error` / `toast.success`.
-6. ⚠️ **Temporary debug logging.** Sign-in/sign-up still contain `console.log` / `console.error` statements that should be cleaned up.
+5. ⚠️ **Sign-in feedback/logging remains unverified.** Its source file contains NUL bytes and must be repaired before it can be reviewed or validated.
 7. ⚠️ **Profile-image upload UI is non-functional.** Sign-up shows upload/URL controls, but only the URL path is sent; no ImgBB upload exists.
 8. ⚠️ **No confirmation dialog primitive installed.** Required destructive-action dialogs will need the shadcn alert-dialog component when that step is approved.
 9. ⚠️ **Existing uncommitted sidebar change.** `DashboardSidebar.tsx` was modified before the protected-routes task. Review it before editing that file.

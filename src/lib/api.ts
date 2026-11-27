@@ -53,17 +53,30 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 async function getAccessToken(): Promise<string> {
-  const response = await fetch("/api/auth/token", {
-    credentials: "include",
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch("/api/auth/token", {
+      credentials: "include",
+      cache: "no-store",
+    });
+  } catch {
+    throw new Error("Unable to reach the authentication service. Check your connection and try again.");
+  }
 
   if (!response.ok) {
     throw new Error("Unable to authenticate with the appointment service.");
   }
 
-  const body: unknown = await response.json();
+  const body = await readJson(response);
 
   if (!isRecord(body) || typeof body.token !== "string") {
     throw new Error("The authentication response did not include an access token.");
@@ -96,12 +109,17 @@ async function requestApi<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`${apiUrl.replace(/\/+$/, "")}${path}`, {
-    ...options,
-    headers,
-    credentials: "omit",
-  });
-  const body: unknown = await response.json();
+  let response: Response;
+  try {
+    response = await fetch(`${apiUrl.replace(/\/+$/, "")}${path}`, {
+      ...options,
+      headers,
+      credentials: "omit",
+    });
+  } catch {
+    throw new Error("Unable to reach the appointment service. Check your connection and try again.");
+  }
+  const body = await readJson(response);
 
   if (!response.ok) {
     const message =

@@ -42,12 +42,21 @@ const SignUp = () => {
   }
 
   // Handle Google signup
-const handleGoogleSignUp = async () => {
-  await authClient.signIn.social({
-    provider: "google",
-    callbackURL: "/",
-  });
-};
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+      if (error) toast.error(error.message || "Unable to sign up with Google.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to sign up with Google. Please try again.",
+      );
+    }
+  };
 
   // Handle form submission
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -63,7 +72,7 @@ const handleGoogleSignUp = async () => {
 
     try {
       // Create user account
-      const { data, error } = await signUp.email({
+      const { error } = await signUp.email({
         name: fullName,
         email,
         password,
@@ -72,16 +81,17 @@ const handleGoogleSignUp = async () => {
       });
 
       if (error) {
-        toast(error.message || "Something went wrong.");
-        console.error(error);
+        toast.error(error.message || "Unable to create account.");
         return;
       }
 
-      console.log(data);
-      toast("Account created successfully!");
+      toast.success("Account created successfully!");
     } catch (error) {
-      console.error(error);
-      toast("Unable to create account. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to create account. Please try again.",
+      );
     }
   }
 

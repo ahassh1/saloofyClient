@@ -40,7 +40,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
       setError(null);
 
       try {
-        const services = await apiFetch<SalonService[]>("/api/admin/services");
+        const services = await apiFetch<SalonService[]>("/api/services");
         const service = services.find((item) => item._id === serviceId);
 
         if (!service) {
@@ -123,24 +123,35 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
       return;
     }
 
-    const formData = new FormData();
-    formData.set("name", name.trim());
-    formData.set("category", category);
-    formData.set("description", description.trim());
-    formData.set("price", String(numericPrice));
-    formData.set("durationMinutes", String(numericDuration));
-    if (imageFile) formData.set("image", imageFile);
-
     setSaving(true);
 
     try {
+      let nextImageUrl = imageUrl;
+      if (imageFile) {
+        const imageData = new FormData();
+        imageData.set("image", imageFile);
+        const upload = await apiFetch<{ imageUrl: string }>(
+          "/api/services/upload-image",
+          { method: "POST", body: imageData },
+        );
+        if (!upload.imageUrl) throw new Error("The image upload did not return an image URL.");
+        nextImageUrl = upload.imageUrl;
+      }
+
       await apiFetch(
         editing
-          ? `/api/admin/services/${encodeURIComponent(serviceId!)}`
-          : "/api/admin/services",
+          ? `/api/services/${encodeURIComponent(serviceId!)}`
+          : "/api/services",
         {
           method: editing ? "PATCH" : "POST",
-          body: formData,
+          body: JSON.stringify({
+            name: name.trim(),
+            category,
+            description: description.trim(),
+            price: numericPrice,
+            durationMinutes: numericDuration,
+            imageUrl: nextImageUrl,
+          }),
         },
       );
       toast.success(editing ? "Service updated." : "Service added.");
@@ -160,7 +171,7 @@ export default function ServiceForm({ serviceId }: ServiceFormProps) {
   if (loading) {
     return (
       <div
-        className="mx-auto h-[36rem] w-full max-w-3xl animate-pulse rounded-2xl bg-sand/70"
+        className="mx-auto h-144 w-full max-w-3xl animate-pulse rounded-2xl bg-sand/70"
         aria-label="Loading service"
       />
     );
