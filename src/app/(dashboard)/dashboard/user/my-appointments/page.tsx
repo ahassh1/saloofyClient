@@ -1,11 +1,5 @@
-import React from 'react';
+import CustomerAppointments from "@/components/dashboard/user/CustomerAppointments";
 
-const UserAppointment = () => {
-    return (
-        <div>
-         user   appointment
-        </div>
-    );
-};
-
-export default UserAppointment;
+export default function UserAppointmentsPage() {
+  return <CustomerAppointments />;
+}

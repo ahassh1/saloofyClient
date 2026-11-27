@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Customer Dashboard Validation",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/c",
+				"npm run lint && npm run build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

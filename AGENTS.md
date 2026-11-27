@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **Last updated:** 2026-11-22
 **Current phase:** Phase 1 — client foundation and authentication (partially complete). The Express API has not been started.
-**Current task status:** Documentation baseline created. No application code was created or modified.
+**Current task status:** Customer dashboard client pages are implemented against the documented Express API contract. Editor diagnostics found no issues, but lint/build and browser validation remain pending; the Express backend is still missing.
 
 > Read this entire file before every task. This file is the single source of truth for scope, architecture, data rules, conventions, and progress. If a request conflicts with this file, stop and ask the user before proceeding.
 
@@ -711,7 +711,7 @@ Then update Section 16 of this file.
 
 **Snapshot date:** 2026-11-27
 **Latest commit:** `fbf6a1d` — “part-2: added role base dashboard navigatation & hidration, hooks ihssue resolved”
-**Uncommitted changes:** protected-route work in `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/lib/auth-guard.ts`, `src/lib/api-auth.ts`, `src/app/(dashboard)/layout.tsx`, both dashboard role layouts, `/blocked` page, `SignOutButton`, the `Download.tsx` build-blocking variant fix, plus the pre-existing `src/components/dashboard/shared/DashboardSidebar.tsx` change (not touched by this task).
+**Uncommitted changes:** previously documented protected-route and sidebar changes, plus the customer dashboard pages, appointment API helper/hook, Better Auth JWT plugin configuration, and a VS Code validation task.
 
 ### 16.1 Completed
 
@@ -744,6 +744,9 @@ Then update Section 16 of this file.
 - 🟡 Service browsing component is a placeholder (`src/components/services/service-browser.tsx`).
 - 🟡 Authentication flows work, but sign-in/sign-up feedback and logging still need cleanup (see known issues).
 - 🟡 Role guards run per layout, not on every client navigation inside the same role area; future data access must re-verify the session (DAL pattern).
+- 🟡 Customer appointment pages are wired to the planned API contract but cannot load or mutate appointment data until the Express API is created.
+- 🟡 Customer dashboard overview and profile form are implemented; lint/build and browser validation are still pending.
+- 🟡 Better Auth JWT plugin is configured for the planned Express API; runtime token issuance has not been verified.
 
 ### 16.3 Pending
 
@@ -772,10 +775,11 @@ Then update Section 16 of this file.
 **Appointments and users**
 
 - ⬜ Appointment creation API with all validation, duplicate protection, and server-forced statuses.
-- ⬜ Customer appointments page: list, cancel pending, pay confirmed.
+- ⬜ Express appointment endpoints for customer-owned appointment listing and pending cancellation.
+- ⬜ Express Stripe Checkout endpoint and verified webhook.
 - ⬜ Admin appointments page: list, filter, confirm, cancel.
 - ⬜ Admin users page: list, search, block/unblock.
-- ⬜ Customer/admin profile pages with Better Auth profile updates.
+- ⬜ Admin profile page with Better Auth profile updates.
 - ⬜ Customer and admin dashboard overview data.
 
 **Payments**
@@ -788,6 +792,7 @@ Then update Section 16 of this file.
 
 **Quality and delivery**
 
+- ⬜ Run lint/build and manually verify the customer dashboard when the client can be started; appointment actions additionally require the Express API.
 - ⬜ Loading skeletons, empty states, error states, confirmation dialogs, and status badges everywhere required.
 - ⬜ Full responsive and accessibility pass.
 - ⬜ Remove debug logs and placeholder copy.
@@ -811,7 +816,7 @@ Then update Section 16 of this file.
 7. ⚠️ **Profile-image upload UI is non-functional.** Sign-up shows upload/URL controls, but only the URL path is sent; no ImgBB upload exists.
 8. ⚠️ **No confirmation dialog primitive installed.** Required destructive-action dialogs will need the shadcn alert-dialog component when that step is approved.
 9. ⚠️ **Existing uncommitted sidebar change.** `DashboardSidebar.tsx` was modified before the protected-routes task. Review it before editing that file.
-10. ⚠️ **All dashboard pages are placeholders** and show static text.
+10. ⚠️ **Admin dashboard pages remain placeholders** and show static text. Customer appointment data/actions remain unavailable until the Express API is implemented; the new client pages have not yet passed lint/build or browser validation.
 11. ⚠️ **Blocked users can still sign in.** They are redirected to `/blocked` and cannot use dashboards, but no Better Auth hook revokes their sessions yet; blocking must also be enforced by every future API call.
 
 **Policy/scope questions (do not invent behavior)**

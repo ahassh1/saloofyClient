@@ -1,9 +1,5 @@
-const UserMyProfile = () => {
-  return (
-    <div>
-      user my profile
-    </div>
-  );
-};
+import CustomerProfile from "@/components/dashboard/user/CustomerProfile";
 
-export default UserMyProfile;
+export default function UserMyProfile() {
+  return <CustomerProfile />;
+}
