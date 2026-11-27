@@ -96,9 +96,16 @@ export default function ServiceDetails({ serviceId }: { serviceId: string }) {
   if (loading) {
     return (
       <div
-        className="mx-auto my-12 h-[32rem] w-[calc(100%-2.5rem)] max-w-6xl animate-pulse rounded-2xl bg-sand/70"
-        aria-label="Loading service"
-      />
+        role="status"
+        aria-busy="true"
+        className="mx-auto my-12 w-[calc(100%-2.5rem)] max-w-6xl"
+      >
+        <p className="mb-3 text-sm text-mocha">Loading service details...</p>
+        <div
+          aria-hidden="true"
+          className="h-[32rem] animate-pulse rounded-2xl bg-sand/70"
+        />
+      </div>
     );
   }
 
@@ -168,7 +175,13 @@ export default function ServiceDetails({ serviceId }: { serviceId: string }) {
         </div>
 
         {sessionPending ? (
-          <div className="mt-6 h-40 animate-pulse rounded-xl bg-sand/70" />
+          <div
+            role="status"
+            aria-busy="true"
+            className="mt-6 rounded-xl bg-sand/70 p-4 text-sm text-mocha"
+          >
+            Checking your account...
+          </div>
         ) : isCustomer && service.isActive ? (
           <form onSubmit={submitBooking} className="mt-6 space-y-5">
             <div>
@@ -222,6 +235,8 @@ export default function ServiceDetails({ serviceId }: { serviceId: string }) {
             <button
               type="submit"
               disabled={booking || !service.isActive}
+              aria-busy={booking}
+              aria-live="polite"
               className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-espresso px-5 text-sm font-semibold text-ivory hover:bg-mocha disabled:opacity-60"
             >
               {booking && (

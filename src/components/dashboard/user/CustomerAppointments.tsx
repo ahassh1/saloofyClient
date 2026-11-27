@@ -96,10 +96,16 @@ export default function CustomerAppointments() {
       </div>
 
       {loading ? (
-        <div className="mt-8 space-y-4" aria-label="Loading appointments">
+        <div
+          className="mt-8 space-y-4"
+          role="status"
+          aria-busy="true"
+        >
+          <p className="text-sm text-mocha">Loading your appointments...</p>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
+              aria-hidden="true"
               className="h-52 animate-pulse rounded-2xl border border-line bg-cream"
             />
           ))}
@@ -243,6 +249,7 @@ export default function CustomerAppointments() {
                             type="button"
                             onClick={() => void cancelAppointment(appointment)}
                             disabled={isBusy}
+                            aria-busy={isBusy}
                             className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-line px-4 text-sm font-semibold text-espresso hover:bg-sand disabled:opacity-60"
                           >
                             {isBusy && (
@@ -259,6 +266,8 @@ export default function CustomerAppointments() {
                             type="button"
                             onClick={() => void payForAppointment(appointment)}
                             disabled={isBusy}
+                            aria-busy={isBusy}
+                            aria-live="polite"
                             className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-espresso px-4 text-sm font-semibold text-ivory hover:bg-mocha disabled:opacity-60"
                           >
                             {isBusy && (
@@ -267,7 +276,7 @@ export default function CustomerAppointments() {
                                 aria-hidden="true"
                               />
                             )}
-                            Pay now
+                            {isBusy ? "Opening secure checkout..." : "Pay now"}
                           </button>
                         )}
                       </div>

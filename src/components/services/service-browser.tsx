@@ -132,12 +132,19 @@ export default function ServiceBrowser() {
         </div>
       ) : loading ? (
         <div
-          aria-label="Loading services"
+          aria-busy="true"
           className="mx-auto mt-10 grid max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
+          <p
+            role="status"
+            className="col-span-full text-center text-sm text-mocha"
+          >
+            Loading salon services...
+          </p>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
+              aria-hidden="true"
               className="h-96 animate-pulse rounded-2xl bg-sand/70"
             />
           ))}

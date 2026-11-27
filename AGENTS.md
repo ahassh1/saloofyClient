@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **Last updated:** 2026-11-27
 **Current phase:** Phase 1 — client foundation and authentication (partially complete). The separate Express API exists and is being connected to the client.
-**Current task status:** Stripe Checkout and webhook code plus payment return pages are implemented, and all 8 server tests pass. Client lint/build are blocked by pre-existing NUL-byte files; live Stripe + MongoDB webhook testing remains.
+**Current task status:** Stripe Checkout/webhook code and payment return pages are implemented; service, customer dashboard, booking, and checkout waits now have clear loading feedback. Server tests pass; client lint/build remain blocked by pre-existing NUL-byte files.
 
 > Read this entire file before every task. This file is the single source of truth for scope, architecture, data rules, conventions, and progress. If a request conflicts with this file, stop and ask the user before proceeding.
 
@@ -751,6 +751,7 @@ Then update Section 16 of this file.
 - 🟡 Authentication flows work, but sign-in/sign-up feedback and logging still need cleanup (see known issues).
 - 🟡 Role guards run per layout, not on every client navigation inside the same role area; future data access must re-verify the session (DAL pattern).
 - 🟡 Customer appointment payment flow is wired to the existing Express API; broader appointment actions still need endpoint compatibility checks.
+- 🟡 Labeled loading states are present for service fetching, customer dashboard/appointment data, booking submissions, and checkout; admin dashboard loading remains unverified because its source file contains NUL bytes.
 - 🟡 Customer dashboard overview and profile form are implemented; lint/build and browser validation are still pending.
 - 🟡 Better Auth JWT plugin is configured for the planned Express API; runtime token issuance has not been verified.
 
@@ -797,7 +798,7 @@ Then update Section 16 of this file.
 **Quality and delivery**
 
 - ⬜ Resolve existing NUL-byte client files, then pass lint/build and manually verify the payment return pages.
-- ⬜ Loading skeletons, empty states, error states, confirmation dialogs, and status badges everywhere required.
+- 🟡 Loading feedback added for services, customer dashboard/appointments, booking, and checkout; remaining dashboard states and confirmation dialogs still need implementation.
 - ⬜ Full responsive and accessibility pass.
 - ⬜ Remove debug logs and placeholder copy.
 - ⬜ Restrict `next.config.ts` remote image hosts once ImgBB is configured.

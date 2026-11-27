@@ -71,32 +71,42 @@ export default function CustomerOverview() {
           </button>
         </div>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map(({ label, value, icon: Icon }, index) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-line bg-cream p-5 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm text-mocha">{label}</p>
-                  {loading ? (
-                    <div className="mt-3 h-9 w-12 animate-pulse rounded-lg bg-sand" />
-                  ) : (
-                    <p className="mt-2 font-display text-4xl font-semibold">
-                      {value}
-                    </p>
-                  )}
+        <>
+          {loading && (
+            <p role="status" className="mt-6 text-sm text-mocha">
+              Loading your dashboard data...
+            </p>
+          )}
+          <div
+            aria-busy={loading}
+            className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          >
+            {stats.map(({ label, value, icon: Icon }, index) => (
+              <div
+                key={label}
+                className="rounded-2xl border border-line bg-cream p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm text-mocha">{label}</p>
+                    {loading ? (
+                      <div className="mt-3 h-9 w-12 animate-pulse rounded-lg bg-sand" />
+                    ) : (
+                      <p className="mt-2 font-display text-4xl font-semibold">
+                        {value}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`grid size-11 place-items-center rounded-xl ${statStyles[index]}`}
+                  >
+                    <Icon className="size-5 text-espresso" aria-hidden="true" />
+                  </span>
                 </div>
-                <span
-                  className={`grid size-11 place-items-center rounded-xl ${statStyles[index]}`}
-                >
-                  <Icon className="size-5 text-espresso" aria-hidden="true" />
-                </span>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
